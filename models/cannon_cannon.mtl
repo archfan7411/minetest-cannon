@@ -1,0 +1,68 @@
+# Blender MTL File: 'cannon_model_mt.blend'
+# Material Count: 6
+
+newmtl barrel
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 0
+map_Kd C:\Users\pmd\Pictures\cannonbarrel2.png
+
+newmtl barrel_default_stone.png
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 0
+map_Kd C:\Users\pmd\Downloads\minetest-0.4.16-sfan5\minetest-0.4.16-win64\mods\default\textures\default_stone.png
+
+newmtl cart
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 0
+map_Kd C:\Users\pmd\Downloads\minetest-0.4.16-sfan5\minetest-0.4.16-win64\mods\default\textures\default_wood.png
+
+newmtl machinery
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 0
+map_Kd C:\Users\pmd\Downloads\minetest-0.4.16-sfan5\minetest-0.4.16-win64\mods\default\textures\default_steel_block.png
+
+newmtl machinery_default_stone.png
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 0
+map_Kd C:\Users\pmd\Downloads\minetest-0.4.16-sfan5\minetest-0.4.16-win64\mods\default\textures\default_stone.png
+
+newmtl wheels
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 0
+map_Kd C:\Users\pmd\Downloads\minetest-0.4.16-sfan5\minetest-0.4.16-win64\mods\default\textures\default_cobble.png
