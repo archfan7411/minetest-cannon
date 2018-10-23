@@ -66,7 +66,7 @@ minetest.register_node("cannon:cannon", {
 		},
 	drawtype = "mesh",
 	mesh = "cannon_cannon.obj",
-	paramtype1 = "light",
+	paramtype = "light",
 	paramtype2 = "facedir",
     on_punch = function(pos, node, player, pointed_thing)
       firingVector = player:get_look_dir()
