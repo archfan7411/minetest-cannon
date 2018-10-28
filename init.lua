@@ -64,6 +64,7 @@ minetest.register_node("cannon:cannon", {
 	tiles = {
 		{name = "cannon_machinery.png"},{name = "cannon_machinery.png"},{name = "cannon_barrel.png"},{name = "cannon_barrel.png"},{name="cannon_wood.png"},{name="cannon_wheels.png"}
 		},
+	groups = {cracky = 3},
 	drawtype = "mesh",
 	mesh = "cannon_cannon.obj",
 	paramtype = "light",
