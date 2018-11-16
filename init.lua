@@ -5,21 +5,18 @@ local CONST_Y_OFFSET = 20 -- Increase for easier aiming without having to dig yo
 
 -- Definition for cannon projectile entity.
 minetest.register_entity("cannon:cannonball", {
-	initial_properites = {
-		hp_max = 1,
-		physical = true,
-		weight = 0,
-		collisionbox = {1, 1, 1, 1, 1, 1},
-		visual = "sprite",
-		visual_size = {x=1, y=1},
-		textures = {"cannon_cannonball.png"},
-		spritediv = {x=1, y=1},
-		initial_sprite_basepos = {x=0, y=0},
-		is_visible = true,
-		makes_footstep_sound = false,
-		automatic_rotate = false
-	},
-	-- Every server step, check if we've hit something.
+	hp_max = 1,
+	physical = true,
+	weight = 0,
+	collisionbox = {1, 1, 1, 1, 1, 1},
+	visual = "sprite",
+	visual_size = {x=1, y=1},
+	textures = {"cannon_cannonball.png"},
+	spritediv = {x=1, y=1},
+	initial_sprite_basepos = {x=0, y=0},
+	is_visible = true,
+	makes_footstep_sound = false,
+	automatic_rotate = false,
 	on_step = function(self, dtime)
 		local node = minetest.get_node_or_nil(self.object:get_pos())
 		if node ~= nil then
@@ -30,6 +27,7 @@ minetest.register_entity("cannon:cannonball", {
 		end
 	end
 })
+
 -- Fire function, an abstraction to make for easier debugging
 -- "entity" is a string, such as "cannon:cannonball". "position" is a normal position array; so is "vector".
 -- Example use: fire("cannon:cannon_cannonball", {0,0,0}, {0,10,20})
