@@ -1,5 +1,3 @@
--- Trebuchet mod by archfan7411. Licensed under MIT, written September 2018.
-
 -- Constants for customization.
 local CONST_CANNON_SPEED = 50
 local CONST_GRAVITY = -10
@@ -58,7 +56,7 @@ local function fire(entity, position, vector)
   end
 
 -- Cannon node definition.
--- It directly invokes fire() when punched, with the player look vector.
+-- It directly invokes fire() when punched, and passes the player look vector.
 minetest.register_node("cannon:cannon", {
     description = "Cannon",
 	tiles = {
