@@ -18,9 +18,11 @@ minetest.register_entity("cannon:cannonball", {
 	makes_footstep_sound = false,
 	automatic_rotate = false,
 	on_step = function(self, dtime)
-		local node = minetest.get_node_or_nil(self.object:get_pos())
+		local pos = self.object:get_pos()
+		local node = minetest.get_node_or_nil(pos)
 		if node ~= nil then
 			if node.name ~= "air" then
+				minetest.remove_node({x=round(pos.x), y=round(pos.y), z=round(pos.z)})
 				minetest.chat_send_all("Hit target!")
 				self.object:remove()
 			end
@@ -39,18 +41,12 @@ local function fire(entity, position, vector)
 	vector.z = vector.z * CONST_CANNON_SPEED
     obj:set_velocity(vector) -- time to whiz across enemy lines
 	obj:set_acceleration({x = 0, y = CONST_GRAVITY, z = 0}) -- Every server step, we apply more gravity to the entity.
-	--[[ local checkIfHit -- We want to do something when the cannonball hits a non-air node.
-	checkIfHit = function(obj)
-		local node = minetest.get_node(obj:get_pos())
-		if node.name == "air" then
-		    minetest.after(0.2, checkIfHit)
-			end
-		if node.name ~= "air" then
-			minetest.chat_send_all("Hit target. Removing.")
-			obj:remove()
-			end
-		end ]]--
 	end
+  end
+
+-- Rounding function to help in getting the node impacted.
+function round(n)
+  return n % 1 >= 0.5 and math.ceil(n) or math.floor(n)
   end
 
 -- Cannon node definition.
@@ -68,5 +64,5 @@ minetest.register_node("cannon:cannon", {
     on_punch = function(pos, node, player, pointed_thing)
       firingVector = player:get_look_dir()
       fire("cannon:cannonball", pos, firingVector)
-      end
+	  end
   })
