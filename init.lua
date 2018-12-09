@@ -7,7 +7,7 @@ local Y_OFFSET = 20 -- Increase for easier aiming without having to dig yourself
 -- Definition for cannon projectile entity.
 minetest.register_entity("cannon:cannonball", {
 	hp_max = 1,
-	physical = true,
+	physical = false,
 	weight = 0,
 	collisionbox = {1, 1, 1, 1, 1, 1},
 	visual = "sprite",
@@ -20,6 +20,9 @@ minetest.register_entity("cannon:cannonball", {
 	automatic_rotate = false,
 	on_step = function(self, dtime)
 		local pos = self.object:get_pos()
+		if minetest.get_node_or_nil(pos) == nil then
+			self.object:remove()
+		end
 		if nodes_exist_in_radius(pos) then
 			destroy_nodes_in_radius(pos)
 			self.object:remove()
@@ -48,9 +51,14 @@ end
 
 function is_valid_hit(pos)
 	node = minetest.get_node_or_nil(pos)
+	if node == nil then
+		return false
+	end
 	if node.name ~= "air" then
 		if node.name ~= "cannon:cannon" then
-			return true
+			if node.name ~= "ignore" then
+				return true
+			end
 		end
 	end
 	return false
@@ -110,10 +118,8 @@ minetest.register_node("cannon:cannon", {
 	  end,
 	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
 	  minetest.show_formspec(player:get_player_name(), "cannon:load",
-	  	"size[6,3]" ..
+	  	"size[3,3]" ..
 	  	"label[0,0;Load cannon here]" ..
-		"label[3,0;Change Y-offset]" ..
-		"field[3,2;2,1;offset;Offset]" ..
-		"button_exit[0,2;2,1;exit;Done]")
+			"button_exit[0,2;2,1;exit;Done]")
 	  end
   })
