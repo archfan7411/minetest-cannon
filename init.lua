@@ -1,7 +1,8 @@
 -- Constants for customization.
 local CONST_CANNON_SPEED = 50
 local CONST_GRAVITY = -10
-local CONST_Y_OFFSET = 20 -- Increase for easier aiming without having to dig yourself into the ground.
+local Y_OFFSET = 20 -- Increase for easier aiming without having to dig yourself into the ground. Not a constant, modifiable via formspec.
+
 
 -- Definition for cannon projectile entity.
 minetest.register_entity("cannon:cannonball", {
@@ -19,13 +20,9 @@ minetest.register_entity("cannon:cannonball", {
 	automatic_rotate = false,
 	on_step = function(self, dtime)
 		local pos = self.object:get_pos()
-		local node = minetest.get_node_or_nil(pos)
-		if node ~= nil then
-			if node.name ~= "air" then
-				minetest.remove_node({x=round(pos.x), y=round(pos.y), z=round(pos.z)})
-				minetest.chat_send_all("Hit target!")
-				self.object:remove()
-			end
+		if nodes_exist_in_radius(pos) then
+			destroy_nodes_in_radius(pos)
+			self.object:remove()
 		end
 	end
 })
@@ -37,20 +34,66 @@ local function fire(entity, position, vector)
   obj = minetest.add_entity(position, entity)
   if obj then -- If adding the entity was a success
 	vector.x = vector.x * CONST_CANNON_SPEED
-	vector.y = vector.y * CONST_CANNON_SPEED + CONST_Y_OFFSET
+	vector.y = vector.y * CONST_CANNON_SPEED + Y_OFFSET
 	vector.z = vector.z * CONST_CANNON_SPEED
-    obj:set_velocity(vector) -- time to whiz across enemy lines
+		obj:set_velocity(vector) -- time to whiz across enemy lines
 	obj:set_acceleration({x = 0, y = CONST_GRAVITY, z = 0}) -- Every server step, we apply more gravity to the entity.
 	end
-  end
+end
 
 -- Rounding function to help in getting the node impacted.
 function round(n)
   return n % 1 >= 0.5 and math.ceil(n) or math.floor(n)
-  end
+end
+
+function is_valid_hit(pos)
+	node = minetest.get_node_or_nil(pos)
+	if node.name ~= "air" then
+		if node.name ~= "cannon:cannon" then
+			return true
+		end
+	end
+	return false
+end
+
+function nodes_exist_in_radius(pos)
+	if is_valid_hit({x=pos.x, y=pos.y, z=pos.z}) then
+		return true
+	end
+	if is_valid_hit({x=pos.x, y=pos.y+1, z=pos.z}) then
+		return true
+	end
+	if is_valid_hit({x=pos.x, y=pos.y-1, z=pos.z}) then
+			return true
+	end
+	if is_valid_hit({x=pos.x+1, y=pos.y, z=pos.z}) then
+			return true
+	end
+	if is_valid_hit({x=pos.x-1, y=pos.y, z=pos.z}) then
+			return true
+	end
+	if is_valid_hit({x=pos.x, y=pos.y, z=pos.z+1}) then
+			return true
+	end
+	if is_valid_hit({x=pos.x, y=pos.y, z=pos.z-1}) then
+			return true
+	end
+	return false
+end
+
+function destroy_nodes_in_radius(pos)
+	minetest.remove_node({x=round(pos.x),y=round(pos.y),z=round(pos.z)})
+	minetest.remove_node({x=round(pos.x),y=round(pos.y+1),z=round(pos.z)})
+	minetest.remove_node({x=round(pos.x),y=round(pos.y-1),z=round(pos.z)})
+	minetest.remove_node({x=round(pos.x+1),y=round(pos.y),z=round(pos.z)})
+	minetest.remove_node({x=round(pos.x-1),y=round(pos.y),z=round(pos.z)})
+	minetest.remove_node({x=round(pos.x),y=round(pos.y),z=round(pos.z+1)})
+	minetest.remove_node({x=round(pos.x),y=round(pos.y),z=round(pos.z-1)})
+end
 
 -- Cannon node definition.
 -- It directly invokes fire() when punched, and passes the player look vector.
+-- It also handles loading the cannon via a formspec.
 minetest.register_node("cannon:cannon", {
     description = "Cannon",
 	tiles = {
@@ -64,5 +107,13 @@ minetest.register_node("cannon:cannon", {
     on_punch = function(pos, node, player, pointed_thing)
       firingVector = player:get_look_dir()
       fire("cannon:cannonball", pos, firingVector)
+	  end,
+	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
+	  minetest.show_formspec(player:get_player_name(), "cannon:load",
+	  	"size[6,3]" ..
+	  	"label[0,0;Load cannon here]" ..
+		"label[3,0;Change Y-offset]" ..
+		"field[3,2;2,1;offset;Offset]" ..
+		"button_exit[0,2;2,1;exit;Done]")
 	  end
   })
