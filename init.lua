@@ -1,7 +1,19 @@
+cannon = {}
+
 -- Constants for customization.
 local CONST_CANNON_SPEED = 50
 local CONST_GRAVITY = -10
 local Y_OFFSET = 20 -- Increase for easier aiming without having to dig yourself into the ground. Not a constant, modifiable via formspec.
+
+cannon.blacklisted_nodes = { -- Nodes the cannonball can't 'hit'
+	["air"] = "match",
+	["ignore"] = "match",
+	["water"] = "find",
+	["lava"] = "find",
+	["cannon:cannon"] = "match"
+}
+
+cannon.ball_timeout = 5 -- Time in seconds before the cannonball explodes
 
 
 -- Definition for cannon projectile entity.
@@ -20,12 +32,22 @@ minetest.register_entity("cannon:cannonball", {
 	automatic_rotate = false,
 	on_step = function(self, dtime)
 		local pos = self.object:get_pos()
-		if minetest.get_node_or_nil(pos) == nil then
-			self.object:remove()
+		local obj = self.object
+		local node_ahead = vector.add(pos, vector.normalize(obj:get_velocity()))
+
+		if not self.timer then
+			self.timer = 0
+		else
+			self.timer = self.timer + dtime
 		end
-		if nodes_exist_in_radius(pos) then
-			destroy_nodes_in_radius(pos)
-			self.object:remove()
+
+		if minetest.get_node_or_nil(pos) == nil then
+			obj:remove()
+		end
+
+		if self.timer >= cannon.ball_timeout or cannon.can_hit_node(node_ahead) == true then
+			cannon.destroy_nodes_in_radius(pos)
+			obj:remove()
 		end
 	end
 })
@@ -44,59 +66,46 @@ local function fire(entity, position, vector)
 	end
 end
 
--- Rounding function to help in getting the node impacted.
-function round(n)
-  return n % 1 >= 0.5 and math.ceil(n) or math.floor(n)
-end
+function cannon.can_hit_node(pos)
+	local node = minetest.get_node_or_nil(pos)
 
-function is_valid_hit(pos)
-	node = minetest.get_node_or_nil(pos)
 	if node == nil then
 		return false
 	end
-	if node.name ~= "air" then
-		if node.name ~= "cannon:cannon" then
-			if node.name ~= "ignore" then
-				return true
+
+	for string, method in pairs(cannon.blacklisted_nodes) do
+		if method == "find" then
+			if node.name:find(string) then
+				return false
+			end
+		else
+			if node.name == string then
+				return false
 			end
 		end
 	end
-	return false
+
+	return true
 end
 
-function nodes_exist_in_radius(pos)
-	if is_valid_hit({x=pos.x, y=pos.y, z=pos.z}) then
-		return true
-	end
-	if is_valid_hit({x=pos.x, y=pos.y+1, z=pos.z}) then
-		return true
-	end
-	if is_valid_hit({x=pos.x, y=pos.y-1, z=pos.z}) then
-			return true
-	end
-	if is_valid_hit({x=pos.x+1, y=pos.y, z=pos.z}) then
-			return true
-	end
-	if is_valid_hit({x=pos.x-1, y=pos.y, z=pos.z}) then
-			return true
-	end
-	if is_valid_hit({x=pos.x, y=pos.y, z=pos.z+1}) then
-			return true
-	end
-	if is_valid_hit({x=pos.x, y=pos.y, z=pos.z-1}) then
-			return true
-	end
-	return false
-end
+function cannon.destroy_nodes_in_radius(pos)
+	pos = vector.round(pos)
 
-function destroy_nodes_in_radius(pos)
-	minetest.remove_node({x=round(pos.x),y=round(pos.y),z=round(pos.z)})
-	minetest.remove_node({x=round(pos.x),y=round(pos.y+1),z=round(pos.z)})
-	minetest.remove_node({x=round(pos.x),y=round(pos.y-1),z=round(pos.z)})
-	minetest.remove_node({x=round(pos.x+1),y=round(pos.y),z=round(pos.z)})
-	minetest.remove_node({x=round(pos.x-1),y=round(pos.y),z=round(pos.z)})
-	minetest.remove_node({x=round(pos.x),y=round(pos.y),z=round(pos.z+1)})
-	minetest.remove_node({x=round(pos.x),y=round(pos.y),z=round(pos.z-1)})
+	minetest.remove_node(pos)
+	pos.y = pos.y + 1
+	minetest.remove_node(pos)
+	pos.y = pos.y - 2
+	minetest.remove_node(pos)
+	pos.y = pos.y + 1
+	pos.x = pos.x + 1
+	minetest.remove_node(pos)
+	pos.x = pos.x - 2
+	minetest.remove_node(pos)
+	pos.x = pos.x + 1
+	pos.z = pos.z + 1
+	minetest.remove_node(pos)
+	pos.z = pos.z - 2
+	minetest.remove_node(pos)
 end
 
 -- Cannon node definition.
